@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup rules for Android 12+ (API 31). The pre-31 equivalent lives in
+  res/xml/backup_rules.xml.
+
+  Nothing here is a credential: the app has no account and no token. The
+  database holds the user's food log and body measurements, which is exactly
+  what a device-to-device restore should carry over.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <include domain="database" path="cielfit.db" />
+        <include domain="sharedpref" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <include domain="database" path="cielfit.db" />
+        <include domain="sharedpref" path="." />
+    </device-transfer>
+</data-extraction-rules>

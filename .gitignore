@@ -6,3 +6,10 @@ app/build/
 build/
 .idea/
 *.iml
+
+# Signing material must never be committed. Losing the keystore means the app
+# can never be updated on Play under the same identity again.
+keystore.properties
+keystore/
+*.jks
+*.keystore

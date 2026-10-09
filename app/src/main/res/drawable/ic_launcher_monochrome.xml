@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CielFit themed-icon layer (Android 13+). The system tints this single-colour
+  layer from the user's wallpaper palette, so it MUST be flat - a gradient here
+  turns to mud once tinted. Ring and fork are the same geometry as the
+  foreground layer so the two stay visually identical when recoloured.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108"
+    android:tint="#FFFFFF">
+
+    <path
+        android:pathData="M44.77,28.63 A27,27 0 1 0 63.23,28.63"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M46.5,33 L49.5,53.3 M65.3,33 L62.3,53.3"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4.9"
+        android:strokeLineCap="round" />
+
+    <path
+        android:pathData="M47.2,53.3 L64.6,53.3"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5.2"
+        android:strokeLineCap="butt" />
+
+    <path
+        android:pathData="M55.9,53.3 L55.9,63.4"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+</vector>

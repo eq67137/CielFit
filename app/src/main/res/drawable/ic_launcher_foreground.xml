@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  CielFit adaptive icon - FOREGROUND layer. 108x108dp.
+
+  Geometry notes (why these numbers):
+  * Mark is centred at (54,54) with ring radius 27, inside the 66dp safe circle
+    (radius 33), so no OEM mask can slice it. Android 8+ masks down to 72dp.
+  * The ring is an ARC, not a full circle: it starts at 110 deg and sweeps 340 deg,
+    leaving a 40 deg gap at the top so the fork has clean space and the two
+    elements never tangle.
+  * The fork uses TWO thick tines with a wide gap. A three-tine fork loses the
+    gaps between tines when the icon is rendered at 48px and reads as a trident
+    or a tuning fork instead.
+  * Tines converge toward the shoulder, and the shoulder bar is wider than the
+    tine feet, giving the fork head a proper T shape rather than a tuning fork.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- plate ring: 340 deg sweep, gap centred at the top -->
+    <path
+        android:pathData="M44.77,28.63 A27,27 0 1 0 63.23,28.63"
+        android:strokeWidth="5"
+        android:strokeLineCap="round">
+        <aapt:attr name="android:strokeColor">
+            <gradient
+                android:type="sweep"
+                android:centerX="54"
+                android:centerY="54"
+                android:startColor="#FFB120"
+                android:centerColor="#FF6B35"
+                android:endColor="#FF3D71" />
+        </aapt:attr>
+    </path>
+
+    <!-- fork tines: two, converging slightly toward the shoulder -->
+    <path
+        android:pathData="M46.5,33 L49.5,53.3 M65.3,33 L62.3,53.3"
+        android:strokeColor="#00E5A0"
+        android:strokeWidth="4.9"
+        android:strokeLineCap="round" />
+
+    <!-- shoulder bar: wider than the tine feet so it reads as a fork head -->
+    <path
+        android:pathData="M47.2,53.3 L64.6,53.3"
+        android:strokeColor="#00E5A0"
+        android:strokeWidth="5.2"
+        android:strokeLineCap="butt" />
+
+    <!-- neck and handle (round cap gives the handle its end) -->
+    <path
+        android:pathData="M55.9,53.3 L55.9,63.4"
+        android:strokeColor="#00E5A0"
+        android:strokeWidth="5"
+        android:strokeLineCap="round" />
+</vector>
