@@ -64,3 +64,36 @@ data class UsdaCache(
     val payload: String,             // JSON
     val fetchedAt: Long
 )
+
+// --- Workout tracker (DB v2) -----------------------------------------------
+
+@Entity(tableName = "exercise")
+data class Exercise(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val externalId: String,
+    val name: String,
+    val muscle: String,
+    val equipment: String,
+    val instructions: String
+)
+
+@Entity(tableName = "workout_session")
+data class WorkoutSession(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val dateMillis: Long,
+    val name: String,
+    val notes: String = "",
+    val durationMin: Int = 0,
+    val estimatedKcal: Double = 0.0
+)
+
+@Entity(tableName = "workout_set")
+data class WorkoutSet(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val sessionId: Long,
+    val exerciseId: Long,
+    val exerciseName: String,        // denormalized so history reads without a join
+    val setNum: Int,
+    val reps: Int,
+    val weightKg: Double
+)

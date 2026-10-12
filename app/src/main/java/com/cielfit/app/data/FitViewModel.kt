@@ -14,6 +14,7 @@ import com.cielfit.app.domain.macroSplit
 import com.cielfit.app.ml.FoodClassifier
 import com.cielfit.app.ml.Prediction
 import kotlinx.coroutines.Dispatchers
+import org.json.JSONArray
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -66,6 +67,15 @@ class FitViewModel(app: Application) : AndroidViewModel(app) {
     val predictions: StateFlow<List<ScanCandidate>> = _predictions.asStateFlow()
     val classifierStatus: StateFlow<String> = _classifierStatus.asStateFlow()
     val allEntries: StateFlow<List<MealEntry>> = _allEntries.asStateFlow()
+
+    private val _workoutSessions = MutableStateFlow<List<WorkoutSession>>(emptyList())
+    val workoutSessions: StateFlow<List<WorkoutSession>> = _workoutSessions.asStateFlow()
+
+    private val _exerciseSearchResults = MutableStateFlow<List<Exercise>>(emptyList())
+    val exerciseSearchResults: StateFlow<List<Exercise>> = _exerciseSearchResults.asStateFlow()
+
+    private val _bundlingExercises = MutableStateFlow(false)
+    val bundlingExercises: StateFlow<Boolean> = _bundlingExercises.asStateFlow()
 
     private var classifier: FoodClassifier? = null
 
@@ -288,6 +298,99 @@ class FitViewModel(app: Application) : AndroidViewModel(app) {
             refreshHistory()
             refreshToday()
         }
+    }
+
+    // ---------- workout tracker ----------
+
+    fun loadWorkouts() {
+        viewModelScope.launch {
+            _workoutSessions.value = db.workoutDao().allSessionsOnce()
+        }
+    }
+
+    fun searchExercises(query: String) {
+        viewModelScope.launch {
+            if (query.length < 2) { _exerciseSearchResults.value = emptyList(); return@launch }
+            _exerciseSearchResults.value = db.exerciseDao().search(query)
+        }
+    }
+
+    fun clearExerciseSearch() { _exerciseSearchResults.value = emptyList() }
+
+    suspend fun getExercise(id: Long): Exercise? = db.exerciseDao().byExternalId(id.toString())
+
+    fun addWorkoutSession(name: String, notes: String, durationMin: Int, estimatedKcal: Double) {
+        viewModelScope.launch {
+            val id = db.workoutDao().addSession(
+                WorkoutSession(
+                    dateMillis = System.currentTimeMillis(),
+                    name = name,
+                    notes = notes,
+                    durationMin = durationMin,
+                    estimatedKcal = estimatedKcal
+                )
+            )
+            loadWorkouts()
+        }
+    }
+
+    fun addWorkoutSet(sessionId: Long, exerciseId: Long, exerciseName: String, setNum: Int, reps: Int, weightKg: Double) {
+        viewModelScope.launch {
+            db.workoutDao().addSet(
+                WorkoutSet(
+                    sessionId = sessionId,
+                    exerciseId = exerciseId,
+                    exerciseName = exerciseName,
+                    setNum = setNum,
+                    reps = reps,
+                    weightKg = weightKg
+                )
+            )
+        }
+    }
+
+    fun deleteWorkoutSession(id: Long) {
+        viewModelScope.launch {
+            db.workoutDao().deleteSetsForSession(id)
+            db.workoutDao().deleteSession(id)
+            loadWorkouts()
+        }
+    }
+
+    suspend fun getWorkoutSets(sessionId: Long): List<WorkoutSet> = db.workoutDao().setsForSession(sessionId)
+
+    fun bundleExercisesIfNeeded() {
+        viewModelScope.launch {
+            if (db.exerciseDao().count() > 0) return@launch
+            _bundlingExercises.value = true
+            try {
+                val json = getApplication<Application>().assets.open("exercises.json").bufferedReader().use { it.readText() }
+                val arr = JSONArray(json)
+                val list = mutableListOf<Exercise>()
+                for (i in 0 until arr.length()) {
+                    val o = arr.getJSONObject(i)
+                    list.add(
+                        Exercise(
+                            externalId = o.optString("id", ""),
+                            name = o.optString("name", ""),
+                            muscle = o.optString("muscle", ""),
+                            equipment = o.optString("equipment", ""),
+                            instructions = o.optString("instructions", "")
+                        )
+                    )
+                }
+                db.exerciseDao().upsertAll(list)
+            } catch (e: Exception) {
+                android.util.Log.e("CielFit", "exercise bundle failed", e)
+            } finally {
+                _bundlingExercises.value = false
+            }
+        }
+    }
+
+    /** Estimate calories burned: MET × weight(kg) × duration(hr) */
+    fun estimateCaloriesBurned(met: Double, weightKg: Double, durationMin: Int): Double {
+        return met * weightKg * (durationMin / 60.0)
     }
 
     override fun onCleared() {

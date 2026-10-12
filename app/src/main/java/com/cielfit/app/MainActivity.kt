@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ListAlt
+import androidx.compose.material.icons.filled.DirectionsRun
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material.icons.filled.Insights
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -38,6 +39,7 @@ import com.cielfit.app.ui.screens.PlanScreen
 import com.cielfit.app.ui.screens.ScanScreen
 import com.cielfit.app.ui.screens.TodayScreen
 import com.cielfit.app.ui.screens.TrendsScreen
+import com.cielfit.app.ui.screens.WorkoutScreen
 import com.cielfit.app.ui.theme.Bg
 import com.cielfit.app.ui.theme.CielFitTheme
 import com.cielfit.app.ui.theme.SurfaceHigh
@@ -57,6 +59,7 @@ private enum class Tab(val label: String, val icon: ImageVector) {
     LOG("Log", Icons.AutoMirrored.Filled.ListAlt),
     TRENDS("Trends", Icons.Default.Insights),
     PLAN("Plan", Icons.Default.FitnessCenter),
+    WORKOUT("Workout", Icons.Default.DirectionsRun),
     BODY("Body", Icons.Default.Straighten)
 }
 
@@ -99,6 +102,7 @@ private fun CielFitApp() {
                 Tab.LOG -> LogScreen(vm)
                 Tab.TRENDS -> TrendsScreen(vm)
                 Tab.PLAN -> PlanScreen(vm)
+                Tab.WORKOUT -> WorkoutScreen(vm)
                 Tab.BODY -> BodyScreen(vm)
             }
         }

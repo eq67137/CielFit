@@ -96,10 +96,59 @@ interface UsdaDao {
     suspend fun get(key: String): UsdaCache?
 }
 
+@Dao
+interface ExerciseDao {
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun insert(item: Exercise): Long
+
+    @Query("SELECT * FROM exercise WHERE externalId = :externalId LIMIT 1")
+    suspend fun byExternalId(externalId: String): Exercise?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun upsertAll(items: List<Exercise>)
+
+    @Query("SELECT * FROM exercise WHERE name LIKE '%' || :q || '%' ORDER BY name LIMIT 50")
+    suspend fun search(q: String): List<Exercise>
+
+    @Query("SELECT COUNT(*) FROM exercise")
+    suspend fun count(): Int
+}
+
+@Dao
+interface WorkoutDao {
+    @Insert
+    suspend fun addSession(session: WorkoutSession): Long
+
+    @Insert
+    suspend fun addSet(set: WorkoutSet): Long
+
+    @Query("DELETE FROM workout_session WHERE id = :id")
+    suspend fun deleteSession(id: Long)
+
+    @Query("DELETE FROM workout_set WHERE sessionId = :sessionId")
+    suspend fun deleteSetsForSession(sessionId: Long)
+
+    @Query("SELECT * FROM workout_session ORDER BY dateMillis DESC")
+    fun allSessions(): Flow<List<WorkoutSession>>
+
+    @Query("SELECT * FROM workout_session ORDER BY dateMillis DESC")
+    suspend fun allSessionsOnce(): List<WorkoutSession>
+
+    @Query("SELECT * FROM workout_session WHERE dateMillis BETWEEN :from AND :to ORDER BY dateMillis DESC")
+    fun sessionsForDay(from: Long, to: Long): Flow<List<WorkoutSession>>
+
+    @Query("SELECT * FROM workout_session WHERE id = :id LIMIT 1")
+    suspend fun sessionById(id: Long): WorkoutSession?
+
+    @Query("SELECT * FROM workout_set WHERE sessionId = :sessionId ORDER BY exerciseId, setNum")
+    suspend fun setsForSession(sessionId: Long): List<WorkoutSet>
+}
+
 @Database(
     entities = [FoodItem::class, MealEntry::class, WaterLog::class,
-                BodyMetric::class, Setting::class, UsdaCache::class],
-    version = 1,
+                BodyMetric::class, Setting::class, UsdaCache::class,
+                Exercise::class, WorkoutSession::class, WorkoutSet::class],
+    version = 2,
     exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
@@ -109,6 +158,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun bodyDao(): BodyDao
     abstract fun settingDao(): SettingDao
     abstract fun usdaDao(): UsdaDao
+    abstract fun exerciseDao(): ExerciseDao
+    abstract fun workoutDao(): WorkoutDao
 
     companion object {
         @Volatile private var instance: AppDatabase? = null
